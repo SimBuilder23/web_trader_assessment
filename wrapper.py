@@ -13,10 +13,10 @@ def lookup(company_name):
 def quote(ticker_symbol):
    response = json.loads(requests.get(f'http://dev.markitondemand.com/MODApis/Api/v2/quote/json?symbol={ticker_symbol}').text)
    quote = response['LastPrice']
-   print (quote, type(quote))
+   # quote_complete = "The last price of {} is {}.".format(ticker_symbol, quote)
    return quote
 
-quote("AAPL")
+
 
 if __name__ == "__main__":
    pass

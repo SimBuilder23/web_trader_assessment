@@ -5,6 +5,16 @@
         
         <p><br><br>
             This page will CHECK YOUR POSITIONS
+        
+            <form action = "/check_positions" method = "POST">
+                <input name = "ticker_symbol" placeholder="ticker_symbol">
+                <input type = "submit">
+            </form>
         </p>
+        
+        </p>
+
+
+        {{ msg }}
 
 {% endblock %}

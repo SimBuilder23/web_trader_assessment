@@ -1,9 +1,20 @@
-<html>
-    <body>
+{% extends "base.html" %}
+
+{% block main %}
+        
+        
+        
+        
         <p>
-            This page will PNL for SINGLE POSITION
+            This page will PNL for SINGLE POSITION  <br><br>
 
 
+            <form action = "/mtm_pnl" method = "post">
+                <input name = "ticker_symbol" placeholder="ticker_symbol">
+                <input type = "submit">
         </p>
-    </body>
-</html>
+            PNL for {{ ticker_symbol }} is:
+            {{ msg }}
+
+
+        {% endblock %}

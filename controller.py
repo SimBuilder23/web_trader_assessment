@@ -37,8 +37,8 @@ def lookup():
     if request.method == 'GET':
         return render_template('lookup.html')
     else:
-        user_submission = request.form.get('user_submission')
-        return render_template('lookup.html', msg=orm.lookup_passthrough(user_submission))
+        user_submission = request.form.get('company_name')
+        return render_template('lookup.html', msg=w.lookup(user_submission))
 
 
 @app.route('/quote', methods = ['GET', 'POST'])
@@ -47,7 +47,7 @@ def quote():
         return render_template('quote.html')
     else:
         user_submission = request.form.get('ticker_symbol')
-        return render_template('quote_got.html', msg= w.quote(user_submission))  
+        return render_template('quote_got.html', msg= w.quote(user_submission), ticker = user_submission)  
 
 
 @app.route('/mtm_pnl', methods = ['GET', 'POST'])
@@ -56,7 +56,8 @@ def pnl_position():
         return render_template('pnl_position.html')
     else:
         user_submission = request.form.get('ticker_symbol')
-        return render_template('pnl_position.html', msg=orm.mtm_pnl(user_submission))  
+        ticker_PNL = orm.User('simbuilder').mtm_pnl(user_submission)
+        return render_template('pnl_position.html', msg=ticker_PNL, ticker_symbol = user_submission)  
 
 # @app.route('/mtm_pnl_portfolio', methods = ['GET', 'POST'])
 # def pnl_portfolio():
@@ -79,14 +80,20 @@ def check_balance():
         # order_quantity = request.form.get('order_quantity')
 
 
+
+
+
 @app.route('/check_positions', methods = ['GET', 'POST'])
 def check_positions():
     if request.method == 'GET':
         return render_template('check_positions.html')
     else:
-        print ('check_positions')
-        # ticker_symbol = request.form.get('ticker_symbol')   #TODO correct this for check_balance coding
-        # order_quantity = request.form.get('order_quantity')
+        ticker_symbol = request.form.get('ticker_symbol')
+        check_positions = orm.User('simbuilder').check_positions(ticker_symbol)
+        return render_template('check_positions.html', msg= check_positions)  
+
+
+
 
 
 @app.route('/buy', methods = ['GET', 'POST'])

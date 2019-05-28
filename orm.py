@@ -276,6 +276,13 @@ class User:
                     f"""UPDATE positions SET average_price = {new_avg_price}, current_holdings = {new_qty} WHERE ticker_symbol = '{ticker_symbol}'"""
                 )
 
+    def check_positions(self, ticker_symbol):
+        with Database() as db:
+            db.cursor.execute(
+                """SELECT current_holdings, ticker_symbol, average_price FROM positions where user_id=1 AND ticker_symbol= '{}';""".format(ticker_symbol))   #and ticker is ticker
+            current_position = db.cursor.fetchone() 
+            return "You own {} {} shares @ average price {}".format(current_position[0], current_position[1], current_position[2])
+
 
 
             
@@ -295,7 +302,7 @@ class User:
         # if sell: -qty * mkt_price = -mkt_value
 
         market_value = int(trade_volume) * last_price
-        return market_value
+        return float(market_value)
 
 
 
@@ -319,8 +326,10 @@ class User:
 
 
 if __name__ == "__main__":
-    with User('simbuilder') as u:
-        pass
+    pass
+    # with User('simbuilder') as u:
+    #     print(u.check_positions("FB"))
+    #     pass
     #     ticker_symbol = input ("Which ticker? ")
     #     volume = int( input ("How many shares? "))
     #     u.buy(ticker_symbol, volume)  # ticker + order_qty
