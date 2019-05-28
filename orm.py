@@ -169,7 +169,7 @@ class User:
 
 
 
-            if ((my_position[0]) >= (order_quantity) * 1):
+            if ((my_position[0]) >= abs(order_quantity) * 1):
                 User.update_balance (self, self.username, market_value)
 
                 User.record_transaction (self, self.username, buy, execution_price, ticker_symbol, order_quantity, time_stamp)
