@@ -1,9 +1,21 @@
-<html>
-    <body>
-        <p>
-            This page will SELL STOCK
+{% extends "base.html" %}
+
+{% block main %}
+
+<br>
+
+<p>
+    This page will SELL STOCK <br><br>
+
+    <form action = "/sell" method = "POST">
+        <input name = "ticker_symbol" placeholder="ticker_symbol">
+        <input name = "order_quantity" placeholder="order_quanity">
+        <input type = "submit">
+    
+    
+    </form>
 
 
-        </p>
-    </body>
-</html>
+
+</p>
+

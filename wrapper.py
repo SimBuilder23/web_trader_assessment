@@ -6,19 +6,23 @@ import requests
 
 
 def lookup(company_name):
-    response = json.loads(requests.get(f'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input={company_name}').text)
-    ticker_symbol = response[0]['Symbol']
-    return ticker_symbol
+   response = json.loads(requests.get(f'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input={company_name}').text)
+   ticker_symbol = response[0]['Symbol']
+   return ticker_symbol
 
 def quote(ticker_symbol):
-    response = json.loads(requests.get(f'http://dev.markitondemand.com/MODApis/Api/v2/quote/json?symbol={ticker_symbol}').text)
-    quote = response['LastPrice']
-    return quote
+   response = json.loads(requests.get(f'http://dev.markitondemand.com/MODApis/Api/v2/quote/json?symbol={ticker_symbol}').text)
+   quote = response['LastPrice']
+   print (quote, type(quote))
+   return quote
+
+quote("AAPL")
 
 if __name__ == "__main__":
- #   response = json.loads(requests.get('http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=TSLA').text)
- #   user_input = input("What company name? ")
- #   print (lookup(user_input))
+   pass
+#   response = json.loads(requests.get('http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=TSLA').text)
+#   user_input = input("What company name? ")
+#   print (lookup(user_input))
 
-    user_input = input ("Which ticker symbol? ")
-    print (quote(user_input))
+   # user_input = input ("Which ticker symbol? ")
+   # print (quote(user_input))

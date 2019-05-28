@@ -4,6 +4,7 @@ from flask import Flask, render_template, request
 
 import model
 import orm
+import wrapper as w
 
 
 app = Flask(__name__)
@@ -37,7 +38,7 @@ def lookup():
         return render_template('lookup.html')
     else:
         user_submission = request.form.get('user_submission')
-        return render_template('lookup.html', msg=model.lookup_passthrough(user_submission))
+        return render_template('lookup.html', msg=orm.lookup_passthrough(user_submission))
 
 
 @app.route('/quote', methods = ['GET', 'POST'])
@@ -45,8 +46,8 @@ def quote():
     if request.method == 'GET':
         return render_template('quote.html')
     else:
-        user_submission = request.form.get('user_submission')
-        return render_template('quote.html', msg=model.lookup_passthrough(user_submission))  ## need to update to quote
+        user_submission = request.form.get('ticker_symbol')
+        return render_template('quote_got.html', msg= w.quote(user_submission))  
 
 
 @app.route('/mtm_pnl', methods = ['GET', 'POST'])
@@ -54,16 +55,16 @@ def pnl_position():
     if request.method == 'GET':
         return render_template('pnl_position.html')
     else:
-        user_submission = request.form.get('user_submission')
-        return render_template('pnl_position.html', msg=model.lookup_passthrough(user_submission))  ## need to update to PNL position
+        user_submission = request.form.get('ticker_symbol')
+        return render_template('pnl_position.html', msg=orm.mtm_pnl(user_submission))  
 
-@app.route('/mtm_pnl_portfolio', methods = ['GET', 'POST'])
-def pnl_portfolio():
-    if request.method == 'GET':
-        return render_template('pnl_portfolio.html')
-    else:
-        user_submission = request.form.get('user_submission')
-        return render_template('pnl_portfolio.html', msg=model.lookup_passthrough(user_submission))  ## need to update to PNL portfolio
+# @app.route('/mtm_pnl_portfolio', methods = ['GET', 'POST'])
+# def pnl_portfolio():
+#     if request.method == 'GET':
+#         return render_template('pnl_portfolio.html')
+#     else:
+#         user_submission = request.form.get('user_submission')
+#         return render_template('pnl_portfolio.html', msg=orm.lookup_passthrough(user_submission))  
 
 
 
@@ -95,9 +96,9 @@ def buy():
     else:
         ticker_symbol = request.form.get('ticker_symbol')
         order_quantity = request.form.get('order_quantity')
-        print (ticker_symbol, order_quantity)
-        # confirmation_message = model.User('kyle').buy(ticker_symbol, order_quantity)
-        #return render_template('confirm.html', msg = confirmation_message)
+        # print (ticker_symbol, order_quantity)
+        confirmation_message = orm.User('simbuilder').buy(ticker_symbol, order_quantity)                ## username is hardcoded to simbuilder
+        return render_template('confirmation.html', msg = confirmation_message)
 
 @app.route('/sell', methods = ['GET', 'POST'])
 def sell():
@@ -107,8 +108,8 @@ def sell():
         ticker_symbol = request.form.get('ticker_symbol')
         order_quantity = request.form.get('order_quantity')
         print (ticker_symbol, order_quantity)
-        # confirmation_message = model.User('kyle').buy(ticker_symbol, order_quantity)
-        #return render_template('confirm.html', msg = confirmation_message)
+        confirmation_message = orm.User('simbuilder').sell(ticker_symbol, order_quantity)             ## username is hardcoded to simbuilder
+        return render_template('confirmation.html', msg = confirmation_message)
 
 
 

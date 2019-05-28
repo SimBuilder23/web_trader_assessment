@@ -5,7 +5,7 @@ import csv
 import datetime
 import time
 
-import sqlite3
+import psycopg2
 import pandas as pd
 
 import wrapper as w
@@ -15,7 +15,7 @@ import wrapper as w
 
 class Database:
     def __init__(self):
-        self.connection = sqlite3.connect('terminal_trader.db', check_same_thread=False)
+        self.connection = psycopg2.connect(dbname = 'terminal_trader')
         self.cursor     = self.connection.cursor()
 
     def __enter__(self):
@@ -41,17 +41,17 @@ class Database:
                 ADD COLUMN {column_name} {column_type}
                 ;""".format(table_name = table_name, column_name = column_name, column_type = column_type))
 
-    # def does_not_exist(self, username):
-    #     with Database() as db:
-    #         db.cursor.execute(
-    #             "SELECT username FROM users WHERE username=?;", (username,))
-    #         occurences = db.cursor.fetchall()
-    #         if len(occurences) < 1:
-    #             print("occurences", occurences, type(occurences))
-    #             return True
-    #         else:
-    #             print("username taken")
-    #             return False
+    def does_not_exist(username):
+        with Database() as db:
+            db.cursor.execute(
+                "SELECT username FROM users WHERE username=%s;", (username,))
+            occurences = db.cursor.fetchall()
+            if len(occurences) < 1:
+                print("occurences", occurences, type(occurences))
+                return True
+            else:
+                print("username taken")
+                return False
 
 
 
@@ -75,28 +75,15 @@ class User:
             db.cursor.execute(
                 """SELECT password
                     FROM users
-                    WHERE username=?;""",
+                    WHERE username=%s;""",
                     (self.username,))
             if password == db.cursor.fetchone():
                 return True
             else:
                 return False
 
-    def does_not_exist(self, username):
-        with Database() as db:
-            db.cursor.execute(
-                """SELECT username FROM users WHERE username=?;""", (username,))
-            occurences = db.cursor.fetchall()
-            if len(occurences) < 1:
-                print("occurences", occurences, type(occurences))
-                return True
-            else:
-                print("username taken")
-                return False
-
     def signup(self, password, balance):
-        if True:
-        # if does_not_exist(self.username):         # not working during assessment, hardcoding a working solution
+        if does_not_exist(self.username):
             with Database() as db:
                 db.cursor.execute(
                 """INSERT INTO users(
@@ -104,7 +91,7 @@ class User:
                         password,
                         balance
                     ) VALUES (
-                        ?, ?, ?
+                        %s, %s, %s
                     );""", (self.username, password, balance)
                 )
                 return True
@@ -137,11 +124,9 @@ class User:
                 User.record_transaction (self, self.username, buy, execution_price, ticker_symbol, order_quantity, time_stamp)
 
                 print ("Filled! You paid {} for {} {}.".format(last_price, trade_volume, ticker_symbol))
-                return "Filled! You paid {} for {} {}.".format(last_price, trade_volume, ticker_symbol)
 
             else:
                 print ("Rejected! You don't have enough funds available.")
-                return "Rejected! You don't have enough funds available."
 
 
 
@@ -159,27 +144,21 @@ class User:
             last_price = w.quote(ticker_symbol)
             execution_price = last_price
 
-            order_quantity = int(trade_volume) * -1 # makes a sell neg. qty
+            order_quantity = trade_volume * -1 # makes a sell neg. qty
             time_stamp = time.time()
 
             market_value = User.calc_market_value(self, trade_volume, last_price) * -1 # makes a sell pos. cash
 
-            print (my_position, "--", type(my_position))
-            print (order_quantity, "--", type(order_quantity))
 
-
-
-            if ((my_position[0]) >= (order_quantity) * 1):
+            if ((my_position[0]) >= abs(order_quantity)):
                 User.update_balance (self, self.username, market_value)
 
                 User.record_transaction (self, self.username, buy, execution_price, ticker_symbol, order_quantity, time_stamp)
 
                 print ("Filled! You sold {} {} @ {}.".format(trade_volume, ticker_symbol, last_price))
-                return "Filled! You sold {} {} @ {}.".format(trade_volume, ticker_symbol, last_price)
 
             else:
                 print (f"Rejected! You don't have enough {ticker_symbol} available to sell.")
-                return f"Rejected! You don't have enough {ticker_symbol} available to sell."
 
 
 
@@ -215,7 +194,7 @@ class User:
                     order_quantity,
                     time_stamp
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?
+                    %s, %s, %s, %s, %s, %s
                 );""", (1, buy, execution_price, ticker_symbol, order_quantity, time_stamp)
             )
 
@@ -237,7 +216,7 @@ class User:
                             ticker_symbol,
                             current_holdings
                         ) VALUES (
-                            ?, ?, ?, ?
+                            %s, %s, %s, %s
                         );""", (1, execution_price, ticker_symbol, order_quantity)
                 )
 
@@ -260,10 +239,10 @@ class User:
                         break                       # is this good style/syntax - using a break here?
 
                 # add original qty to order qty to get the updated holdings qty
-                new_qty = old_qty + int(order_quantity)
+                new_qty = old_qty + order_quantity
 
                 # use SUMPRODUCT of original position and new order to get new avg price
-                order_mkt_value = int(order_quantity) * execution_price
+                order_mkt_value = order_quantity * execution_price
                 new_mkt_value = old_mkt_value + order_mkt_value
 
                 if new_qty == 0:     #TODO if qty == 0, delete position row in SQL
@@ -294,7 +273,7 @@ class User:
         # if buy: +qty * mkt_price = +mkt_value
         # if sell: -qty * mkt_price = -mkt_value
 
-        market_value = int(trade_volume) * last_price
+        market_value = trade_volume * last_price
         return market_value
 
 
@@ -320,65 +299,11 @@ class User:
 
 if __name__ == "__main__":
     with User('simbuilder') as u:
-        pass
-    #     ticker_symbol = input ("Which ticker? ")
-    #     volume = int( input ("How many shares? "))
-    #     u.buy(ticker_symbol, volume)  # ticker + order_qty
+        #ticker_symbol = input ("Which ticker? ")
+        #volume = int( input ("How many shares? "))
+        #u.sell(ticker_symbol, volume)  # ticker + order_qty
 
 #        u.update_balance ('username', 25000)
 
-#        print (u.mtm_pnl('AAPL'))
-
-
-
-
-    # with Database() as db:
-    #     tab1 = {"name" : "users",
-    #             "columns" : [
-    #                 {"name":"username",  "type":"VARCHAR"},
-    #                 {"name":"password",  "type":"VARCHAR"},
-    #                 {"name":"balance",   "type":"FLOAT"}]}
-
-    #     tab2 = {"name" : "transactions",
-    #             "columns" : [
-    #                 {"name":"user_id",           "type":"INTEGER"},
-    #                 {"name":"buy",               "type":"INTEGER"},
-    #                 {"name":"execution_price",   "type":"FLOAT"},
-    #                 {"name":"ticker_symbol",     "type":"VARCHAR"},
-    #                 {"name":"order_quantity",    "type":"INTEGER"},
-    #                 {"name":"time_stamp",        "type":"FLOAT"}]}
-
-    #     ## TODO Add a functio to the database class,
-    #     ## to handle for the following statement:
-    #     ## which should be added to the 'tab2' 'tab3':
-    #     ## FOREIGN KEY(user_id) REFERENCES users(pk)
-
-    #     tab3 = {"name" : "positions",
-    #             "columns" : [
-    #                 {"name":"user_id",           "type":"INTEGER"},
-    #                 {"name":"average_price",     "type":"FLOAT"},
-    #                 {"name":"ticker_symbol",     "type":"VARCHAR"},
-    #                 {"name":"current_holdings",  "type":"INTEGER"}]}
-
-
-    #     for table in [tab1, tab2, tab3]:
-    #         db.create_table(table["name"])
-    #         for column_name in table["columns"]:
-    #             db.add_column(
-    #                 table["name"],
-    #                 column_name["name"],
-    #                 column_name["type"])
-
-##    user = User("kyle")
-##    print(user.signup("rippere"))
-
-    # with User('simbuilder') as u:
-    #     u.signup('opensesame', 1000000.00)
-
-    # with User('player2') as u:
-    #     u.signup('opensesame2', 1000000.00)
-
-    # with User('player3') as u:
-    #     u.signup('opensesame3', 1000000.00)
-
+        print (u.mtm_pnl('AAPL'))
 
