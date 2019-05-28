@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<br>
+
+
+
+See My Portfolio.  <br><br>
+
+(Shows the TICKER, QTY, and AVG PRICE)  <br><br>
+        <form action = "/see_portfolio" method = "post">
+            <input type = "submit">
+
+
+
+        </form>
+        <p> {{ msg }} </p>
+
+
+
+{% endblock %}

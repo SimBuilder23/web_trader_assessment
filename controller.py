@@ -80,7 +80,13 @@ def check_balance():
         # order_quantity = request.form.get('order_quantity')
 
 
-
+@app.route('/see_portfolio', methods = ['GET', 'POST'])
+def see_portfolio():
+    if request.method == 'GET':
+        return render_template('see_portfolio.html')
+    else:
+        print ('see_portfolio')
+        return render_template('see_portfolio.html', msg = orm.User("simbuilder").see_portfolio("simbuilder")) 
 
 
 @app.route('/check_positions', methods = ['GET', 'POST'])

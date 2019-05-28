@@ -284,8 +284,19 @@ class User:
             return "You own {} {} shares @ average price {}".format(current_position[0], current_position[1], current_position[2])
 
 
+    def see_portfolio(self, username):
+            with Database() as db:
+                db.cursor.execute(
+                    """SELECT ticker_symbol, current_holdings, average_price FROM positions where user_id=1;"""
+                )
+                my_holdings = db.cursor.fetchall()
+                print (my_holdings)
+                return (my_holdings)
 
-            
+
+
+
+
     def update_positions(self):
         pass
 
@@ -325,9 +336,11 @@ class User:
 
 
 
+
 if __name__ == "__main__":
     pass
     # with User('simbuilder') as u:
+    #     u.see_portfolio("simbuilder")    
     #     print(u.check_positions("FB"))
     #     pass
     #     ticker_symbol = input ("Which ticker? ")
