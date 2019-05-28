@@ -45,4 +45,5 @@ def sell_menu():
             input("\n    Trade Volume:   ")
 
 if __name__ == "__main__":
-    print(login_menu())
+    #print(login_menu())
+    main_menu()

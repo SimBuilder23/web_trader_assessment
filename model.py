@@ -44,9 +44,9 @@ d = {'date':[],
 
 
 
-df2 = pd.DataFrame(d, index=list('xyza'))
+# df2 = pd.DataFrame(d, index=list('xyza'))
 
-if __name__ == '__main__':
-    print (df2)
+# if __name__ == '__main__':
+#     print (df2)
 
 

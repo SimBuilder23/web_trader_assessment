@@ -257,12 +257,12 @@ class User:
 
 
 
-            # if the ticker doesn't already exist in the transactions table, then need to insert ticker_symbol, and add the data
-
-    def update_positions():
+            
+    def update_positions(self):
         pass
 
-
+    def check_balance(self):
+        pass
 
 
     def calc_market_value(self, trade_volume, last_price):
@@ -305,4 +305,5 @@ if __name__ == "__main__":
 
 #        u.update_balance ('username', 25000)
 
-        print(u.mtm_pnl('AAPL'))
+        print (u.mtm_pnl('AAPL'))
+
